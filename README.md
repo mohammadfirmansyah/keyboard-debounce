@@ -1,13 +1,13 @@
 <!-- Screenshot Section -->
 <p align="center">
-  <img src="screenshot/Log-event.png" alt="Log Event" width="400" style="margin-right: 10px;">
-  <img src="screenshot/Log-chattering.png" alt="Log Chattering" width="400">
+  <img src="screenshot/Log-event.png" alt="Log Event" width="40%" style="margin-right: 10px;">
+  <img src="screenshot/Log-chattering.png" alt="Log Chattering" width="40%">
 </p>
  
  <a href="https://github.com/mohammadfirmansyah/keyboard-debounce/commits/main"><img src="https://img.shields.io/github/commit-activity/t/mohammadfirmansyah/keyboard-debounce/main?style=for-the-badge&label=Total%20Commits&color=success" alt="Total Commits"></a>
  <a href="https://github.com/mohammadfirmansyah/keyboard-debounce/commits/main"><img src="https://img.shields.io/github/last-commit/mohammadfirmansyah/keyboard-debounce/main?style=for-the-badge&color=success&display_timestamp=committer" alt="Last Commit"></a>
- <a href="https://github.com/mohammadfirmansyah/keyboard-debounce/releases/latest"><img src="https://img.shields.io/github/v/release/mohammadfirmansyah/keyboard-debounce?include_prereleases&label=Latest%20Release&style=for-the-badge&color=informational" alt="Latest Release"></a>
- <a href="https://github.com/mohammadfirmansyah/keyboard-debounce/releases/latest"><img src="https://img.shields.io/github/release-date/mohammadfirmansyah/keyboard-debounce?display_date=created_at&style=for-the-badge&label=Release%20Date&color=success" alt="Release Date"></a>
+ <!-- <a href="https://github.com/mohammadfirmansyah/keyboard-debounce/releases/latest"><img src="https://img.shields.io/github/v/release/mohammadfirmansyah/keyboard-debounce?include_prereleases&label=Latest%20Release&style=for-the-badge&color=informational" alt="Latest Release"></a>
+ <a href="https://github.com/mohammadfirmansyah/keyboard-debounce/releases/latest"><img src="https://img.shields.io/github/release-date/mohammadfirmansyah/keyboard-debounce?display_date=created_at&style=for-the-badge&label=Release%20Date&color=success" alt="Release Date"></a> -->
 
 # Keyboard Debounce
 
