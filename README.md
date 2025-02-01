@@ -1,7 +1,7 @@
 <!-- Screenshot Section -->
 <p align="center">
-  <img src="screenshot/Log-event.png" alt="Log Event" width="45%" style="margin-right: 10%;">
-  <img src="screenshot/Log-chattering.png" alt="Log Chattering" width="45%">
+  <img src="screenshot/Log-event.png" alt="Log Event" width="50%">
+  <img src="screenshot/Log-chattering.png" alt="Log Chattering" width="50%">
 </p>
  
 <div align="center">
