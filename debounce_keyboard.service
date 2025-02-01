@@ -1,0 +1,12 @@
+[Unit]
+Description=Penyaring Papan Ketik Debounce Service
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/mohammadfirmansyah/keyboard-debounce
+ExecStart=/bin/bash /home/mohammadfirmansyah/keyboard-debounce/run_debounce.sh
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
