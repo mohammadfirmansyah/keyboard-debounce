@@ -1,2 +1,9 @@
-threshold=50
-language=id
+threshold=100
+language=en
+custom_thresholds={}
+shortcut_pause="KEY_PAUSE"
+shortcut_continue="KEY_SCROLLLOCK"
+force_disable_qemu=True
+debounce_mode=down
+repeat_rate=30.0
+repeat_delay=300

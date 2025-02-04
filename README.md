@@ -1,7 +1,7 @@
 <!-- Screenshot Section -->
 <p align="center">
-  <img src="screenshot/Log-event.png" alt="Log Event" width="49%">
-  <img src="screenshot/Log-chattering.png" alt="Log Chattering" width="49%">
+  <img src="screenshot/Statistics.png" alt="Statistics" width="49%">
+  <img src="screenshot/Bounces.png" alt="Bounces" width="49%">
 </p>
  
 <div align="center">
@@ -13,129 +13,178 @@
 
 # Keyboard Debounce
 
-**Keyboard Debounce** adalah aplikasi Python untuk menyaring (debounce) input dari perangkat keyboard secara per-tombol guna mengatasi _chattering_. Aplikasi ini mendeteksi penekanan tombol yang terjadi terlalu cepat (misalnya, kurang dari 50 ms) dan memblokirnya sehingga hanya event valid yang diteruskan ke sistem. Selain itu, aplikasi ini mendukung dua mode:
+**Keyboard Debounce** adalah aplikasi Python untuk menyaring (debounce) input dari **perangkat keyboard**. Aplikasi ini mencegah masuknya event _bounce_ atau _chattering_ yang terjadi ketika tombol ditekan dalam interval waktu yang sangat singkat, sehingga hanya event yang valid saja yang diteruskan ke sistem.
 
-- **Mode GUI (default):** Menampilkan antarmuka grafis dengan log input dan log chattering, serta opsi untuk mengganti bahasa (Bahasa Indonesia / English).
-- **Mode Background:** Aplikasi berjalan sebagai _service_ (tanpa GUI) dan menyimpan log secara persisten ke file teks.
-
-Konfigurasi (seperti _threshold_ dan bahasa) serta log disimpan secara _persisten_ di file teks sehingga log baru selalu ditambahkan ke bawah log lama.
-
----
+Aplikasi ini cocok untuk mengurangi kesalahan input pada keyboard dan memiliki fitur-fitur yang dapat disesuaikan melalui antarmuka grafis maupun file konfigurasi.
 
 ## Fitur Utama
 
-- **Debounce Per-Tombol:**  
-  - Nilai default _threshold_ adalah 50 ms.
-  - Hanya penekanan valid pertama secara global yang dicatat tanpa delay, sedangkan penekanan valid berikutnya menampilkan delay (dalam ms) dari penekanan valid global sebelumnya.
-  - Jika penekanan tombol yang sama terjadi dalam interval kurang dari _threshold_, event tersebut dianggap sebagai _chattering_ dan **tidak diteruskan ke sistem**, hanya dicatat di _Log Chattering_.
+1. **Debounce Input Keyboard Secara Real-Time**  
+   - Memfilter _bounce_ berdasarkan dua mode deteksi:
+     - **Key Down:** Validasi dilakukan saat tombol ditekan.
+     - **Key Up:** Validasi berdasarkan selisih waktu antara penekanan dan pelepasan tombol.
 
-- **Dukungan Dua Bahasa:**  
-  - Antarmuka (UI) dan log mendukung Bahasa Indonesia dan English.  
-  - Tombol untuk mengganti bahasa ("ID" dan "EN") diletakkan di sebelah kanan dengan lebar tombol persegi.
+2. **Antarmuka GUI Modern & Multibahasa**  
+   - Tampilan GUI menggunakan [ttkthemes](https://pypi.org/project/ttkthemes/) dengan tema `"arc"`.
+   - Mendukung dua bahasa: **Bahasa Indonesia** dan **English**. Ganti bahasa secara langsung melalui tombol **ID** dan **EN** di pojok kanan atas.
 
-- **Persistensi Konfigurasi & Log:**  
-  - Konfigurasi disimpan di `config.txt`.
-  - Log _input_ disimpan di `log_input.txt` dan log _chattering_ disimpan di `log_chatter.txt` secara _append_, sehingga log lama tidak akan di‑overwrite.
+3. **Pengaturan Konfigurasi & Log yang Persisten**  
+   - **config.txt** menyimpan pengaturan seperti threshold global, mode deteksi (_down/up_), custom threshold per tombol, shortcut untuk pause/continue, serta pengaturan _repeat key_ (rate & delay).
+   - Log event disimpan ke:
+     - **log_input.txt** untuk event keyboard yang valid.
+     - **log_bounce.txt** untuk event yang difilter sebagai _bounce_.
+   - Semua file konfigurasi dan log disimpan dalam direktori yang sama dengan file `debounce_keyboard.py`.
 
-- **Single Instance & Auto-Restart:**  
-  - Menggunakan file PID (`debounce_keyboard.pid`) untuk memastikan hanya satu instance aplikasi yang berjalan. Jika aplikasi dijalankan lagi, instance sebelumnya akan dihentikan dan aplikasi direstart.
+4. **Custom Threshold Per Tombol**  
+   - Atur nilai threshold khusus untuk tombol tertentu melalui tab **Custom Threshold** di GUI.
 
-- **Mode Background:**  
-  - Dapat dijalankan tanpa antarmuka (GUI) dengan menggunakan argumen `--nogui`, sehingga cocok untuk dijalankan sebagai _service_.
+5. **Shortcut Pause/Continue**  
+   - Atur tombol shortcut untuk menghentikan (_pause_) dan melanjutkan (_continue_) proses debounce secara manual melalui tab **Pause Debounce**.
 
-- **Tema GUI:**  
-  - Menggunakan tema ttk “clam” dengan ukuran jendela default 800×500.
-  - Terdapat _auto scroll_ untuk log sehingga log baru selalu muncul di bawah tanpa mengganggu posisi scroll.
+6. **Repeat Key Functionality**  
+   - Fitur _repeat key_ dengan pengaturan rate (keys per detik) dan delay sebelum pengulangan ditekan, dapat diatur di tab **Advanced Settings**.
 
----
+7. **Dukungan QEMU/KVM**  
+   - Opsi **Force Disable** debounce saat mendeteksi QEMU/KVM aktif agar tidak terjadi konflik dengan _evdev_.
+
+8. **Single Instance & Auto-Restart**  
+   - Aplikasi memastikan hanya satu instance yang berjalan dengan menggunakan file `debounce_keyboard.pid`.
+   - Jika aplikasi dijalankan ulang, instance sebelumnya akan dihentikan secara otomatis dan digantikan dengan instance baru.
+
+9. **Mode Background (Tanpa GUI)**  
+   - Dapat dijalankan sebagai _service_ atau di latar belakang menggunakan argumen `--nogui`.
+
+10. **Dukungan Wayland**  
+    - Aplikasi ini telah mendukung sistem Wayland. (Pengujian lebih dominan pada sistem Wayland; pada sistem X11 belum diuji secara menyeluruh.)
+
+## System Requirements
+
+- **Python 3**  
+- **pip3**  
+- Library Python: `evdev`, `python-uinput`, `pygame`, dan `ttkthemes`  
+- Sistem operasi Linux (disarankan menggunakan distribusi yang mendukung Wayland, meskipun aplikasi juga dapat berjalan pada sistem X11 dengan catatan pengujian belum optimal pada X11).
+
+### Memasang Python 3 & pip3
+
+1. **Memasang Python 3**  
+   Jika Python 3 belum terpasang, Anda dapat memasangnya melalui _package manager_ sesuai sistem operasi Anda. Contoh:
+
+   - **Debian/Ubuntu:**
+     ```bash
+     sudo apt update
+     sudo apt install python3
+     ```
+   - **Fedora:**
+     ```bash
+     sudo dnf install python3
+     ```
+   - **Arch Linux:**
+     ```bash
+     sudo pacman -S python
+     ```
+
+2. **Memasang pip untuk Python 3**  
+   Pastikan pip (pip3) sudah terpasang. Jika belum, gunakan perintah berikut:
+
+   - **Debian/Ubuntu:**
+     ```bash
+     sudo apt install python3-pip
+     ```
+   - **Fedora:**
+     ```bash
+     sudo dnf install python3-pip
+     ```
+   - **Arch Linux:**
+     ```bash
+     sudo pacman -S python-pip
+     ```
+
+3. **Instalasi Library yang Diperlukan**  
+   Meskipun script `debounce_keyboard.py` akan memasang package yang belum terinstal secara otomatis saat dijalankan pertama kali, Anda juga dapat memasangnya secara manual dengan:
+   ```bash
+   sudo pip3 install --break-system-packages evdev python-uinput pygame ttkthemes
+   ```
 
 ## Struktur File
 
-Pastikan seluruh file berikut berada dalam direktori `~/keyboard-debounce`:
+Pada direktori instalasi (misalnya `~/keyboard-debounce`), terdapat file-file berikut:
 
-- `debounce_keyboard.py` – Script utama aplikasi.
-- `config.txt` – File konfigurasi (akan dibuat otomatis jika belum ada).
-- `log_input.txt` – File log untuk event valid (akan dibuat otomatis jika belum ada).
-- `log_chatter.txt` – File log untuk event chattering (akan dibuat otomatis jika belum ada).
-- `run_debounce.sh` – Shell script untuk menjalankan aplikasi dalam mode background.
-- `debounce_keyboard.service` – File _service_ systemd untuk menjalankan aplikasi saat boot.
-- `README.md` – Dokumentasi lengkap (file ini).
-- Folder `screenshot/` – Berisi screenshot:
-  - `screenshot/Log-event.png`
-  - `screenshot/Log-chattering.png`
+- **debounce_keyboard.py**  
+  _Script_ utama aplikasi.
+- **config.txt**  
+  Menyimpan konfigurasi seperti threshold, bahasa, mode deteksi, custom threshold, shortcut pause/continue, serta pengaturan repeat key. File ini dibuat otomatis jika belum ada.
+- **log_input.txt**  
+  Log event keyboard valid.
+- **log_bounce.txt**  
+  Log event yang dianggap _bounce_.
+- **debounce_keyboard.pid**  
+  File PID untuk memastikan hanya satu instance yang berjalan.
+- **debounce_keyboard.service** (opsional)  
+  Contoh file service systemd untuk menjalankan aplikasi secara otomatis saat boot.
+- **README.md**  
+  Dokumentasi aplikasi ini.
 
----
+## Instalasi & Persiapan
 
-## Instalasi dan Persiapan
-
-### Persyaratan
-- **Python 3**
-- **pip3**
-- **evdev** dan **python‑uinput**  
-  Jika belum terinstal, skrip `debounce_keyboard.py` akan menginstalnya secara otomatis menggunakan:
-  ```bash
-  sudo pip3 install --break-system-packages evdev python-uinput
-  ```
-
-### Instalasi
-1. Clone repositori dengan perintah:
+1. **Kloning Repositori**  
    ```bash
    git clone https://github.com/mohammadfirmansyah/keyboard-debounce.git ~/keyboard-debounce
    ```
-2. Pindah ke direktori repositori:
+2. **Masuk ke Direktori**  
    ```bash
    cd ~/keyboard-debounce
    ```
-3. Pastikan file `run_debounce.sh` memiliki hak akses eksekusi:
-   ```bash
-   chmod +x run_debounce.sh
-   ```
 
----
+## Cara Menjalankan
 
-## Cara Menjalankan Aplikasi
-
-### Mode GUI (Default)
-Untuk menjalankan aplikasi dengan antarmuka grafis, cukup jalankan:
+### 1. Mode GUI (Default)
+Jalankan dengan perintah:
 ```bash
 sudo python3 ~/keyboard-debounce/debounce_keyboard.py
 ```
-Aplikasi akan membuka jendela GUI dengan ukuran 800×500.  
-- Gunakan kolom **Batas Chattering (ms)** untuk mengubah nilai threshold.
-- Tekan tombol **Terapkan** untuk menyimpan konfigurasi (config.txt akan diperbarui).
-- Log _input_ dan _chattering_ akan ditampilkan pada tab masing-masing.
-- Tombol bahasa **ID** dan **EN** di sebelah kanan memungkinkan Anda mengganti bahasa antarmuka dan log secara dinamis.
+Pada mode ini:
+- Antarmuka grafis **Keyboard Debounce** akan muncul.
+- Anda dapat mengubah **Global Bounce Threshold (ms)** di bagian atas, kemudian klik **Terapkan**.
+- **Input Log** dan **Bounce Log** akan menampilkan event yang diteruskan dan yang difilter.
+- Tab **Custom Threshold** memungkinkan pengaturan threshold khusus per tombol.
+- Tab **Pause Debounce** digunakan untuk mengatur shortcut pause dan continue.
+- Tab **Advanced Settings** menyediakan opsi _Force Disable_ QEMU/KVM, pilihan mode deteksi (_After Press_ atau _After Release_), serta pengaturan _repeat key_ (rate & delay).
 
-### Mode Background (Tanpa GUI)
-Untuk menjalankan aplikasi tanpa antarmuka grafis (misalnya, untuk dijalankan sebagai _service_), gunakan argumen `--nogui`:
+### 2. Mode Background (Tanpa GUI)
+Jalankan dengan argumen `--nogui`:
 ```bash
 sudo python3 ~/keyboard-debounce/debounce_keyboard.py --nogui
 ```
-Dalam mode ini, aplikasi akan menjalankan fungsi _monitor keyboard_ secara terus-menerus dan menyimpan log ke file `log_input.txt` dan `log_chatter.txt`.
+Pada mode ini:
+- Aplikasi berjalan di latar belakang tanpa antarmuka grafis.
+- Event keyboard tetap dicatat ke `log_input.txt` dan `log_bounce.txt`.
 
----
+## Menjalankan sebagai Service (Opsional)
 
-## Menjalankan Aplikasi sebagai Service
-
-### File Service Systemd: `debounce_keyboard.service`
-Simpan file berikut (sesuaikan _WorkingDirectory_ dan _ExecStart_ dengan path absolut ke direktori Anda, misalnya `/home/mohammadfirmansyah/keyboard-debounce`):
+Untuk menjalankan aplikasi secara otomatis saat boot, Anda dapat membuat file systemd service. Berikut adalah contoh file `debounce_keyboard.service` (pastikan _WorkingDirectory_ dan _ExecStart_ telah disesuaikan):
 
 ```ini
 [Unit]
 Description=Penyaring Papan Ketik Debounce Service
-After=network.target
+After=network.target sound.target
+Requires=sound.target
 
 [Service]
 Type=simple
 WorkingDirectory=/home/mohammadfirmansyah/keyboard-debounce
-ExecStart=/bin/bash /home/mohammadfirmansyah/keyboard-debounce/run_debounce.sh
+Environment="XDG_RUNTIME_DIR=/run/user/1000"
+Environment="SDL_AUDIODRIVER=alsa"
+ExecStartPre=/bin/sleep 10
+ExecStart=/usr/bin/python3 /home/mohammadfirmansyah/keyboard-debounce/debounce_keyboard.py --nogui
+TimeoutStopSec=1
+KillMode=control-group
 Restart=always
 
 [Install]
 WantedBy=multi-user.target
 ```
 
-Untuk mengaktifkan service:
+Setelah membuat file tersebut, lakukan langkah berikut:
 ```bash
 sudo cp debounce_keyboard.service /etc/systemd/system/
 sudo systemctl daemon-reload
@@ -143,26 +192,47 @@ sudo systemctl enable debounce_keyboard.service
 sudo systemctl start debounce_keyboard.service
 ```
 
-Periksa status service:
+Untuk memeriksa status:
 ```bash
 sudo systemctl status debounce_keyboard.service
 ```
 
----
+## Catatan Penting
 
-## Catatan Akhir
+1. **Single Instance & Auto-Restart**  
+   - File `debounce_keyboard.pid` digunakan untuk memastikan hanya satu instance yang berjalan.  
+   - Jika Anda menjalankan ulang `debounce_keyboard.py`, instance lama akan otomatis dihentikan dan digantikan dengan instance baru.
 
-- **Persistensi:**  
-  Konfigurasi disimpan di `config.txt`, sedangkan log disimpan di `log_input.txt` dan `log_chatter.txt` secara _append_.  
-- **Single Instance:**  
-  Aplikasi menggunakan file PID (`debounce_keyboard.pid`) untuk memastikan hanya satu instance yang berjalan. Jika aplikasi dijalankan lagi, instance sebelumnya akan dihentikan dan aplikasi di restart.
-- **Auto Scroll:**  
-  Log baru akan ditambahkan di bagian bawah dan tampilan akan otomatis bergulir ke bawah.
-- **Instalasi Otomatis:**  
-  Jika library _evdev_ atau _python‑uinput_ belum terinstal, skrip akan menginstalnya secara otomatis.
-- **Mode GUI & Background:**  
-  Aplikasi dapat dijalankan dengan atau tanpa antarmuka grafis, sesuai kebutuhan.
-- **Service:**  
-  Gunakan file service systemd dan shell script untuk menjalankan aplikasi saat boot.
+2. **File Konfigurasi & Log**  
+   - File `config.txt`, `log_input.txt`, dan `log_bounce.txt` dibuat otomatis di folder yang sama dengan `debounce_keyboard.py`.  
+   - Setiap perubahan pada pengaturan (misalnya threshold atau pengaturan repeat key) melalui GUI akan langsung disimpan ke `config.txt`.
 
-Semoga dokumentasi ini membantu Anda dalam menginstal, mengkonfigurasi, dan menjalankan aplikasi Keyboard Debounce!
+3. **Menjalankan dengan Sudo**  
+   - Disarankan menjalankan aplikasi dengan `sudo -E` agar _environment_ user (misalnya variable `XDG_RUNTIME_DIR`) ikut terbawa.
+
+4. **Deteksi QEMU/KVM & Force Disable**  
+   - Jika opsi **Force Disable** aktif di tab **Advanced Settings**, aplikasi akan berhenti melakukan _grab_ pada keyboard saat QEMU/KVM aktif untuk menghindari konflik dengan _evdev_.
+
+5. **Pengaturan Mode Deteksi & Repeat Key**  
+   - Pilih mode deteksi debounce (_After Press_ atau _After Release_) sesuai kebutuhan.  
+   - Pengaturan _repeat key_ (rate & delay) juga dapat diatur dan disimpan secara otomatis.
+
+6. **Mode Background & Service**  
+   - Untuk penggunaan sebagai service, jalankan aplikasi dalam mode `--nogui` agar debounce aktif sejak boot tanpa memunculkan antarmuka grafis.
+
+7. **Dukungan Wayland**  
+   - Aplikasi ini mendukung sistem Wayland. Pengujian telah dilakukan pada lingkungan Wayland meskipun untuk sistem X11 pengujian belum dilakukan secara menyeluruh.
+
+Semoga dokumentasi ini membantu Anda dalam menginstal, mengonfigurasi, dan menjalankan **Keyboard Debounce**. Jika terdapat kendala atau pertanyaan, silakan buka _issue_ di GitHub atau hubungi pengembang.
+
+Selamat mencoba!
+
+## Rencana Update v1.2.0
+
+Pada versi mendatang, direncanakan beberapa peningkatan berikut:
+- **Perbaikan Race Condition:** Menangani kondisi perlombaan (_race condition_) ketika service yang sedang berjalan belum sepenuhnya dihentikan sebelum membuka aplikasi baru.
+- **Notifikasi dan Sound untuk Mode --nogui:** Menambahkan notifikasi serta efek suara saat aplikasi dijalankan dalam mode background (tanpa GUI).
+- **Startup Lebih Cepat:** Menghilangkan delay 10 detik agar aplikasi dapat berjalan lebih cepat pada saat startup.
+- **Stabilitas pada X11:** Memastikan aplikasi berjalan dengan stabil di sistem X11.
+- **Paket Instalasi All-in-One untuk Linux:** Menyediakan paket instalasi (.deb) yang memudahkan instalasi pada sistem Linux.
+- **Dukungan Multi-Platform:** Menambahkan dukungan untuk pembuatan paket instalasi bagi perangkat Windows (.exe) dan macOS (.dmg).

@@ -1,12 +1,19 @@
 [Unit]
 Description=Penyaring Papan Ketik Debounce Service
-After=network.target
+After=network.target sound.target
+Requires=sound.target
 
 [Service]
 Type=simple
 WorkingDirectory=/home/mohammadfirmansyah/keyboard-debounce
-ExecStart=/bin/bash /home/mohammadfirmansyah/keyboard-debounce/run_debounce.sh
+Environment="XDG_RUNTIME_DIR=/run/user/1000"
+Environment="SDL_AUDIODRIVER=alsa"
+ExecStartPre=/bin/sleep 10
+ExecStart=/usr/bin/python3 /home/mohammadfirmansyah/keyboard-debounce/debounce_keyboard.py --nogui
+TimeoutStopSec=1
+KillMode=control-group
 Restart=always
 
 [Install]
 WantedBy=multi-user.target
+
